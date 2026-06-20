@@ -778,82 +778,109 @@ blockquote {
   }
 }
 
-/* Bouton ouverture des archives */
-.archive-open {
-  margin-top: 14px;
-  background: transparent;
+/* Barre de recherche sous le sous-titre */
+.masthead-search {
+  position: relative;
+  max-width: 420px;
+  margin: 16px auto 0;
+  display: flex;
+}
+.masthead-search input {
+  flex: 1;
+  background: #141a0d;
   border: 1px solid #b79a5a;
-  color: #b79a5a;
-  padding: 7px 18px;
+  border-right: 0;
+  color: #f2f2e9;
+  padding: 9px 14px;
   font-family: 'Libre Baskerville', serif;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+  font-size: 0.9rem;
+}
+.masthead-search input::placeholder { color: #8a8467; }
+.masthead-search input:focus { outline: none; background: #1a2110; }
+.masthead-search button {
+  background: #b79a5a;
+  border: 1px solid #b79a5a;
+  color: #0d1208;
+  padding: 0 15px;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-.archive-open:hover { background: rgba(183, 154, 90, 0.15); }
-
-/* Overlay Archives / Recherche */
-.archive-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.93);
-  z-index: 1000;
-  padding: 40px 20px;
-  overflow: auto;
-}
-.archive-overlay.active { display: block; }
-.archive-box {
-  max-width: 760px;
-  margin: 0 auto;
-  background: #0d1208;
-  border: 2px solid #b79a5a;
-  padding: 30px;
-}
-.archive-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  border-bottom: 2px solid #b79a5a;
-  padding-bottom: 14px;
-  margin-bottom: 18px;
+  transition: background 0.2s ease;
 }
-.archive-head h2 {
+.masthead-search button:hover { background: #cdb070; }
+.search-results {
+  display: none;
+  position: absolute;
+  left: 0; right: 0;
+  top: 100%;
+  background: #0d1208;
+  border: 1px solid #b79a5a;
+  border-top: 0;
+  max-height: 320px;
+  overflow: auto;
+  text-align: left;
+  z-index: 200;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.6);
+}
+.search-results.active { display: block; }
+.search-results .sr { padding: 10px 14px; border-bottom: 1px solid rgba(183,154,90,0.15); cursor: pointer; transition: background 0.15s ease; }
+.search-results .sr:hover { background: rgba(183,154,90,0.1); }
+.search-results .sr .srt { font-family: 'Playfair Display', serif; color: #e8e8dc; font-size: 1rem; }
+.search-results .sr .srd { font-size: 0.7rem; color: #b79a5a; text-transform: uppercase; letter-spacing: 1px; }
+.search-results .sr-empty { padding: 14px; color: #d2c9a3; font-style: italic; }
+
+/* Bloc Archives (sous « À lire également ») */
+.archives-box {
+  border: 2px solid #b79a5a;
+  padding: 20px;
+  margin-top: 25px;
+  background: rgba(183, 154, 90, 0.05);
+}
+.archives-box h3 {
   font-family: 'Playfair Display', serif;
   color: #b79a5a;
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-size: 1.6rem;
-}
-.archive-close { font-size: 2.2rem; color: #b79a5a; cursor: pointer; line-height: 1; transition: transform 0.2s ease; }
-.archive-close:hover { transform: scale(1.15); }
-#archiveSearch {
-  width: 100%;
-  background: #141a0d;
-  border: 1px solid #3a3a2a;
-  color: #f2f2e9;
-  padding: 12px 14px;
-  font-family: inherit;
-  font-size: 1rem;
+  text-align: center;
   margin-bottom: 16px;
+  font-size: 1.2rem;
 }
-#archiveSearch:focus { outline: none; border-color: #b79a5a; }
-.archive-year {
-  font-family: 'Playfair Display', serif;
+.archives-years { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.arch-year {
+  position: relative;
+  border: 1px solid #b79a5a;
+  padding: 8px 16px;
+  cursor: pointer;
   color: #d4b77a;
-  font-size: 1.1rem;
-  margin: 18px 0 6px;
-  border-bottom: 1px solid rgba(183, 154, 90, 0.3);
-  padding-bottom: 4px;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  transition: background 0.2s ease;
 }
-.archive-entry { padding: 12px 10px; border-bottom: 1px solid rgba(183, 154, 90, 0.15); cursor: pointer; transition: background 0.15s ease; }
-.archive-entry:hover { background: rgba(183, 154, 90, 0.08); }
-.archive-entry .ae-date { font-size: 0.72rem; color: #b79a5a; text-transform: uppercase; letter-spacing: 1px; }
-.archive-entry .ae-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: #e8e8dc; margin: 2px 0; }
-.archive-entry .ae-deck { font-size: 0.85rem; color: #d2c9a3; font-style: italic; }
-.archive-empty { color: #d2c9a3; font-style: italic; text-align: center; padding: 30px; }
+.arch-year:hover { background: rgba(183, 154, 90, 0.12); }
+.arch-year .cnt { color: #b79a5a; font-size: 0.8rem; }
+.arch-pop {
+  display: none;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 100%;
+  margin-top: 6px;
+  min-width: 270px;
+  max-width: 360px;
+  background: #0d1208;
+  border: 1px solid #b79a5a;
+  padding: 6px;
+  z-index: 300;
+  text-align: left;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.7);
+}
+.arch-year:hover .arch-pop,
+.arch-year.open .arch-pop { display: block; }
+.arch-pop .ap { padding: 9px 11px; border-bottom: 1px solid rgba(183,154,90,0.15); cursor: pointer; transition: background 0.15s ease; }
+.arch-pop .ap:last-child { border-bottom: 0; }
+.arch-pop .ap:hover { background: rgba(183,154,90,0.1); }
+.arch-pop .apd { font-size: 0.66rem; color: #b79a5a; text-transform: uppercase; letter-spacing: 1px; }
+.arch-pop .apt { font-family: 'Playfair Display', serif; color: #e8e8dc; font-size: 1rem; }
 </style>
 </head>
 <body>
@@ -879,7 +906,13 @@ blockquote {
 <div class="masthead">
   <h1>[ LE GRAPPIN ]</h1>
   <p class="subtitle">○ METTRE SA MAIN AU FEU ○</p>
-  <button class="archive-open" onclick="openArchive()">❏ Archives &amp; recherche</button>
+  <div class="masthead-search">
+    <input type="text" id="searchInput" placeholder="Rechercher un article…" autocomplete="off" oninput="renderSearch(this.value)" onkeydown="if(event.key==='Enter')renderSearch(this.value)">
+    <button type="button" aria-label="Rechercher" onclick="renderSearch(document.getElementById('searchInput').value)">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>
+    </button>
+    <div class="search-results" id="searchResults"></div>
+  </div>
 </div>
 
 <div class="newspaper-container">
@@ -916,17 +949,10 @@ blockquote {
       <li><a href="#">Pas plus !</a></li>
     </ul>
   </div>
-</div>
 
-<!-- Overlay Archives / Recherche -->
-<div class="archive-overlay" id="archiveOverlay" onclick="if(event.target===this)closeArchive()">
-  <div class="archive-box">
-    <div class="archive-head">
-      <h2>Archives</h2>
-      <span class="archive-close" onclick="closeArchive()">×</span>
-    </div>
-    <input type="text" id="archiveSearch" placeholder="Rechercher un article (titre, texte, date…)" oninput="renderArchive(this.value)">
-    <div id="archiveList"></div>
+  <div class="archives-box">
+    <h3>Archives</h3>
+    <div class="archives-years" id="archivesYears"></div>
   </div>
 </div>
 
@@ -1280,6 +1306,9 @@ async function writeArticle() {
   views++;
   localStorage.setItem(viewKey, views.toString());
   viewCountElement.textContent = views;
+
+  // (Re)construit le bloc archives
+  buildArchives();
 }
 
 // Navigation vers l'article précédent (PILE)
@@ -1330,7 +1359,7 @@ function nextArticle() {
   }
 }
 
-// ===== Archives / Recherche =====
+// ===== Recherche & Archives =====
 const MOIS_ARCH = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 function formatArchiveDate(iso) {
   if (!iso) return 'Sans date';
@@ -1338,57 +1367,92 @@ function formatArchiveDate(iso) {
   if (p.length !== 3) return iso;
   return (+p[2]) + ' ' + (MOIS_ARCH[+p[1]-1] || '') + ' ' + p[0];
 }
-function openArchive() {
-  document.getElementById('archiveOverlay').classList.add('active');
-  const s = document.getElementById('archiveSearch');
-  s.value = '';
-  renderArchive('');
-  s.focus();
-}
-function closeArchive() {
-  document.getElementById('archiveOverlay').classList.remove('active');
-}
-function renderArchive(q) {
+
+// Recherche (barre sous le sous-titre)
+function renderSearch(q) {
   q = (q || '').toLowerCase().trim();
-  const list = document.getElementById('archiveList');
-  // articlesDatabase est déjà trié du plus récent au plus ancien
+  const box = document.getElementById('searchResults');
+  if (!box) return;
+  if (!q) { box.classList.remove('active'); box.innerHTML = ''; return; }
   const items = articlesDatabase
     .map((a, i) => ({ a, i }))
     .filter(({ a }) => {
-      if (!q) return true;
       const hay = ((a.title||'') + ' ' + (a.deck||'') + ' ' + (a.body||'') + ' ' + (a.meta||'') + ' ' + formatArchiveDate(a.date)).toLowerCase();
       return hay.indexOf(q) !== -1;
     });
-  if (!items.length) { list.innerHTML = '<div class="archive-empty">Aucun article trouvé.</div>'; return; }
-  let html = '', curYear = null;
-  items.forEach(({ a, i }) => {
-    const year = (a.date || '').slice(0, 4) || '—';
-    if (year !== curYear) {
-      curYear = year;
-      html += '<div class="archive-year">' + (year === '—' ? 'Sans date' : year) + '</div>';
-    }
-    html += '<div class="archive-entry" onclick="openArticleByIndex(' + i + ')">'
-          + '<div class="ae-date">' + formatArchiveDate(a.date) + '</div>'
-          + '<div class="ae-title"></div><div class="ae-deck"></div></div>';
+  if (!items.length) { box.innerHTML = '<div class="sr-empty">Aucun article trouvé.</div>'; box.classList.add('active'); return; }
+  box.innerHTML = items.map(({ a, i }) =>
+    '<div class="sr" onclick="openArticleByIndex(' + i + ')"><div class="srt"></div><div class="srd">' + formatArchiveDate(a.date) + '</div></div>'
+  ).join('');
+  const titles = box.querySelectorAll('.sr .srt');
+  items.forEach(({ a }, k) => { if (titles[k]) titles[k].textContent = a.title || '(sans titre)'; });
+  box.classList.add('active');
+}
+
+// Archives par année (sous « À lire également »)
+function buildArchives() {
+  const cont = document.getElementById('archivesYears');
+  if (!cont) return;
+  const groups = {};
+  articlesDatabase.forEach((a, i) => {
+    const y = (a.date || '').slice(0, 4) || '—';
+    (groups[y] = groups[y] || []).push({ a, i });
   });
-  list.innerHTML = html;
-  // Remplissage texte (évite toute injection HTML depuis titres/chapeaux)
-  const entries = list.querySelectorAll('.archive-entry');
-  items.forEach(({ a }, k) => {
-    entries[k].querySelector('.ae-title').textContent = a.title || '(sans titre)';
-    entries[k].querySelector('.ae-deck').textContent = a.deck || '';
+  const years = Object.keys(groups).sort((x, y) => {
+    const xx = (x === '—' ? '0000' : x), yy = (y === '—' ? '0000' : y);
+    return xx < yy ? 1 : (xx > yy ? -1 : 0);   // décroissant, sans-date en dernier
+  });
+  cont.innerHTML = years.map(y => {
+    const list = groups[y];
+    const label = (y === '—' ? 'Sans date' : y);
+    const pop = list.map(({ i }) =>
+      '<div class="ap" onclick="openArticleByIndex(' + i + ')"><div class="apd"></div><div class="apt"></div></div>'
+    ).join('');
+    return '<div class="arch-year" onclick="this.classList.toggle(\'open\')">' + label +
+           ' <span class="cnt">(' + list.length + ')</span><div class="arch-pop">' + pop + '</div></div>';
+  }).join('');
+  // Remplissage texte (sans injection HTML)
+  const yearNodes = cont.querySelectorAll('.arch-year');
+  years.forEach((y, yi) => {
+    const node = yearNodes[yi];
+    if (!node) return;
+    const dates = node.querySelectorAll('.apd');
+    const titles = node.querySelectorAll('.apt');
+    groups[y].forEach(({ a }, k) => {
+      if (dates[k]) dates[k].textContent = formatArchiveDate(a.date);
+      if (titles[k]) titles[k].textContent = a.title || '(sans titre)';
+    });
   });
 }
+
 function openArticleByIndex(i) {
   if (i < 0 || i >= articlesDatabase.length) return;
   currentArticleIndex = i;
-  closeArchive();
+  const box = document.getElementById('searchResults');
+  if (box) box.classList.remove('active');
+  const si = document.getElementById('searchInput');
+  if (si) si.value = '';
+  document.querySelectorAll('.arch-year.open').forEach(n => n.classList.remove('open'));
   writeArticle();
   setRandomLocation();
   setRandomEmail();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeArchive(); });
+
+// Fermer la liste de résultats (clic ailleurs / Échap)
+document.addEventListener('click', (e) => {
+  const s = document.querySelector('.masthead-search');
+  if (s && !s.contains(e.target)) {
+    const box = document.getElementById('searchResults');
+    if (box) box.classList.remove('active');
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const box = document.getElementById('searchResults');
+    if (box) box.classList.remove('active');
+  }
+});
 
 window.addEventListener('load', async () => {
   await loadData();
