@@ -777,6 +777,83 @@ blockquote {
     height: 40px;
   }
 }
+
+/* Bouton ouverture des archives */
+.archive-open {
+  margin-top: 14px;
+  background: transparent;
+  border: 1px solid #b79a5a;
+  color: #b79a5a;
+  padding: 7px 18px;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.archive-open:hover { background: rgba(183, 154, 90, 0.15); }
+
+/* Overlay Archives / Recherche */
+.archive-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.93);
+  z-index: 1000;
+  padding: 40px 20px;
+  overflow: auto;
+}
+.archive-overlay.active { display: block; }
+.archive-box {
+  max-width: 760px;
+  margin: 0 auto;
+  background: #0d1208;
+  border: 2px solid #b79a5a;
+  padding: 30px;
+}
+.archive-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #b79a5a;
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+}
+.archive-head h2 {
+  font-family: 'Playfair Display', serif;
+  color: #b79a5a;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 1.6rem;
+}
+.archive-close { font-size: 2.2rem; color: #b79a5a; cursor: pointer; line-height: 1; transition: transform 0.2s ease; }
+.archive-close:hover { transform: scale(1.15); }
+#archiveSearch {
+  width: 100%;
+  background: #141a0d;
+  border: 1px solid #3a3a2a;
+  color: #f2f2e9;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 1rem;
+  margin-bottom: 16px;
+}
+#archiveSearch:focus { outline: none; border-color: #b79a5a; }
+.archive-year {
+  font-family: 'Playfair Display', serif;
+  color: #d4b77a;
+  font-size: 1.1rem;
+  margin: 18px 0 6px;
+  border-bottom: 1px solid rgba(183, 154, 90, 0.3);
+  padding-bottom: 4px;
+}
+.archive-entry { padding: 12px 10px; border-bottom: 1px solid rgba(183, 154, 90, 0.15); cursor: pointer; transition: background 0.15s ease; }
+.archive-entry:hover { background: rgba(183, 154, 90, 0.08); }
+.archive-entry .ae-date { font-size: 0.72rem; color: #b79a5a; text-transform: uppercase; letter-spacing: 1px; }
+.archive-entry .ae-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: #e8e8dc; margin: 2px 0; }
+.archive-entry .ae-deck { font-size: 0.85rem; color: #d2c9a3; font-style: italic; }
+.archive-empty { color: #d2c9a3; font-style: italic; text-align: center; padding: 30px; }
 </style>
 </head>
 <body>
@@ -802,6 +879,7 @@ blockquote {
 <div class="masthead">
   <h1>[ LE GRAPPIN ]</h1>
   <p class="subtitle">○ METTRE SA MAIN AU FEU ○</p>
+  <button class="archive-open" onclick="openArchive()">❏ Archives &amp; recherche</button>
 </div>
 
 <div class="newspaper-container">
@@ -837,6 +915,18 @@ blockquote {
       <li><a href="#">Toujours rien !</a></li>
       <li><a href="#">Pas plus !</a></li>
     </ul>
+  </div>
+</div>
+
+<!-- Overlay Archives / Recherche -->
+<div class="archive-overlay" id="archiveOverlay" onclick="if(event.target===this)closeArchive()">
+  <div class="archive-box">
+    <div class="archive-head">
+      <h2>Archives</h2>
+      <span class="archive-close" onclick="closeArchive()">×</span>
+    </div>
+    <input type="text" id="archiveSearch" placeholder="Rechercher un article (titre, texte, date…)" oninput="renderArchive(this.value)">
+    <div id="archiveList"></div>
   </div>
 </div>
 
@@ -1024,104 +1114,75 @@ function generateViewCount(articleIndex) {
   return baseViews + randomFactor + ageMultiplier;
 }
 
-// Contenu de l'article
-// Base de données des articles (ajouter vos articles ici)
-const articlesDatabase = [
+// === Données du journal ===
+// Sources de chargement : 1) data.json publié  2) brouillon local (éditeur)
+// Ces valeurs ne servent que de secours si rien n'est disponible.
+let journalConfig = { edition: "N° 01 — 7ᵉ année", price: "Prix : 2,50€", signature: "Venehon" };
+
+let articlesDatabase = [
   {
+    id: "art-1",
     title: "Du temps qu'on l'éditait",
     deck: "Sur Marien-Def'Allah, Ma'falvard, Marien-bonniface, Marienne-la-bonne-fée et tous les Fesses-Marien ou tous ses autres petits-noms que l'on donne aux soubrettes !",
     meta: "Par Venehon — Dimanche 23 novembre 2025",
-    content: `Mille fois le nihilisme, mille fois le paganisme plutôt que de voir ramper des chrétiens traîtres à leur foi ; avide de plus que Dieu de ce Dieu qui leur fût donné. Oh : Du temps qu’on méditait !
-
-
-
-Pourquoi ont-ils donc une foi si vacillante ces oiseaux-là ? Pourquoi les voit-on baver devant les mouquères à trois franges et un colis-volé ? Pourquoi sont-ils si faibles, ont-ils même ce petit faible qui leur vient du pêché-mignon, à croire que Dieu serait pauvre comme ils sont ? 
-
-Si Dieu est tout-puissant, Dieu sait bien qui donc il doit armer pour se sauver - se convertir c’est alors considérer non pas que le monde est monde mais que tout ce que l’église à fait de jadis a nos jours, et qui fut tant aimé, tant estimé par ses mirlitons jouisseurs, dam ces queues d’écrevisses ; chrétiens-bonifaces ; ce serait considérer que tout cela n’a pas été l’œuvre de Dieu ; et donc qu’à peu près tout le Christianisme fut une hérésie.
-
-
-
- Comment peuvent-ils encore se dire voisins de leur Dieu si c’est pour en changer comme on change de chemises ? Et pour s’effrayer du destin de leur religion sitôt qu’au matin la cloche n’a pas sonné - diable que la messe soit reporté, que le prêtre découche, que toutes les femmes soient folles ou vierges de premières communiantes ; vraiment amis faut-ils qu’on soit fous pour croire que Dieu peut-être vaincu si nous le croyons meilleur que les hommes - de croire que la folie des hommes, souvent lézarde, saurait atteindre et définir la vérité divine ? Non vraiment c’est faire bien peu de cas de Dieu. 
-
-
-
-L’adversité n’est rien pour nous, nous ne sommes pas les défaitistes de Dieu, ni même les défaillants ; nous ne changeons pas de tribune sitôt que nous voyons le score nous échappait ; mais c’est qu’ils sont à peu près tous moins encore des croyants que des supporters ; ils ont besoin d’aller en messe comme on va au match ; ils ont besoin de voir que les vicaires, les prêtres, les diacres, les archimoines soient bientôt comme des joueurs en poste ; c’est que leur plus grande aventure mystique n’a jamais été que Saint-Etienne.
-
-La véritable foi est inaliénable ; elle ne s’occupe pas de savoir ce qu’est le monde, elle devrait savoir se préserver d’elle-même sans quoi de sa tentation l’officier est coupable.
-
-La foi n’est pas une église et si votre foi n’a pas été Dieu lui-même ; c’est donc que jamais vous n’aurez cru. 
-
-
-
-Car tout sent Dieu de ce qui vous fait du bien ; mais rien ne sent le Diable dans les malheurs que Dieu vous fait. Car si vous souffrez, c’est d’abord d’avoir aimé vous étant trompé, ou bien de n’être jamais entrer au fond de vos sentiments - êtes-vous triste de n’avoir jamais accomplis cette amour ? Certainement, certainement - ce sera de ce jour que Foi a défailli.
-
-Ce ne sera jamais de voir parader l’ennemi de vos “valeurs” dont je ne suis pas bien-sûr de vous voir les garants ; si des homosexuels mon Dieu vous suffise pour renier votre Dieu ; eh bien, quel infidèle vous faites au bras de Mehmet l’amant du soir ; c’est que tout les Marien-trépané n’ont qu’une seule et véritable place : sinon le sommier d’Haroun El-Poussah, n’être pas moins croyant que le vagin trismégiste d’Asia Shéhérazade ! 
-
-
-
-Ah Marien-bonniface ! Comme je l’imagine ce mètre-carré d’homme lavable en machine - accolyté-minute aux bras d’un quintal de Mahmoud ! Il lui raconterait de ces histoires de petite vierge bonne et décaloteuse : toujours renouvellant, les jours de diette ; ces histoires orléanaise avec Madame de la Courtefigue, psychiatre du palais d’Orient ; que ne nous écrit il pas d’ailleurs son Orient au lieu que de nous alimenter d’un Orléans bouffi de noirs, Dieu ! Du temps qu’on l’éditait !
-
-
-
-Ce fiéffé parrain de Charles Dantzig, qu’il aura fait du bien à toute la littérature Française ! Je veux dire, épargnez-nous grand dieu de dieu, toutes ces furoncles écrivains qui nous viennent ainsi au dos de toutes les écritures, bibles et éditions sollenisé - que Saint-Dantzig, dieu de mes Dieux soit-il loué ! que Saint-Dantzig aura empêché d’advenir !
-
-
-
-Oui, vraiment, ce fut une grande destinée que celle de Marien Defalvard - d’abord né comme on nait de coutûme, il eut une enfance somme toute clergymen ; on se souvient qu’il brocardait son cher Papa sous les soutanes, entre les bites aéronef de nos diacres et consorts ! Dieu ; que ne voyait-on pas le Marien-Trépané croyant que la couille du père Benôit n’était en vérité que le corps-du-christ, offrande de Saint-Geneviève et l’hostie plus-sainte-encore dans laquelle ce Marien-famélique croquait avec la passion de Pierre les pieds du Fils ; hors Mariendegabale, né sur un berceau de sperme ! mort sur un oreiller de gland - que faisait-il d’autres à son jeune âge que de croire que l’émasculé-coucouillon de son père Benoît, et surtout la semence qu’il raclait de ses ongles au soir, comme les épluchures des cierges de la Sacristie - que ne croyait-il pas ce fublique-animal ; ce Mariendelaballe - qu’il s’agissait d’eau-bénite, cent fois sacrée qui ressortait du mât de la bite de ce gentil et tendre Père, Diable ! 
-
-
-
-Qu’il aimait cela, Clergymen en sus – on le fit devenir porteur des myrrhes, des encens, des lampions – thuriféraire ce garçonnet qui n’aurait jamais plû à aucun Gide, Montherlant, Duvert et diable sait-qui-d’autres ! Des milliards sont connus de ces êtres qui bourrichent de petit-Marien ! Mais voilà que notre thuriféraire s’occupait alors de répandre les odeurs..
-
- 
-
-Ah enfin que toute cette fable cesse ! ça ne sert à rien – qu’il aille donc, que Dieu sache et lui redise combien depuis dix ans j’aurais essayé de le ravir à ces destins de convertis léger » comme en d’autres-temps encore nous avions vu paraitrent les « confinés légers » - Dieu te voit Marien ! Dieu sait combien tu es sarkozique ; combien la prison t’as rendu traboulé pour ses rabab et cie de la Santé ! Tu n’en dors plus la nuit de te les imaginer aviné de ces miels de jasmin de tout leurs pays-tièdes, tu n’en dors plus Marienne ! De t’imaginer Mahdjik l’Ouzbek ascendant Numide, à côté de toi, touchant tes deux grosses miches, cul-corne de gazelle– tandis que tu ferais la prière, méditerait rubis sur ongle la shahada et tout accompagnant, ces crustacés théologiques que tu hais tant chez les foires du trônes, chez les pauvres Français que tu conspues, mais que tu admires comme d’un parfum chez ses macramés venus d’ailleurs ou d’ici-bas. Dam ! Du temps qu’on l’enculait ! 
-
-
-
-Voilà pourquoi je ne suis plus Chrétien qui fut une très belle religion d’enfant ; mais comme il y a une littérature pour enfant, la foi doit pouvoir suivre la même évolution : il y a des religions pour les enfants. 
-
-C’est d’ailleurs de la simplicité du dictam chrétiens qu’est né pour l’anéantir tout cet appareillage pseudo-critique qu’est la théologie - mais cete maquignonade pour les filous et les philosophes en mal de Dieu ne convient plus aux âmes d’outremoi qui sont de simples, de bons et de gentils êtres - oh dieu ! J’ai besoin de pouvoir aimer ce que je crois. Si Dieu m’en donne j’ai besoin de le posséder comme je devrais le faire avec une femme. J’ai besoin de pénétrer Dieu, j’ai besoin de le baiser.Voilà pourquoi je me cherche un Dieu-Neuf, Dieu-Volage - car j’ai besoin qu’il soit un peu faune ou satyre. Je veux de ce Dieu-Putain. Je veux d’un Dieu-qui-se-maquille.Je n’ai pas besoin d’un Dieu qui m’aime. Je veux d’un Dieu que je puisse aimer. A Dieu-vat tout ses autres Dieu passif en Diable et qui m’apporterait la paix des champs ! Je veux un Dieu que je puisse enculer, parce que je l’aime. Et qu’il soit plein de moi, et moi plein de lui.Les Dieux disparates, distant, dans les nimbes - eh bien, qu’ils y restent !
-
-Ils reviendront alors vers nous quand ils auront par-trop envier. Enfin, ils auront de quoi se dire des Dieux-jaloux. 
-
-
-
-Je suis trop cerné de ces Dieux-musulmans qui cherchent à ce que je porte un voile de grande-nonne de ces temps jadis ; comme si j’étais la franche houri madame, passant pour n’être pas un homme pour des Afghans ; convertissant mon cul pour le sourire des uns - diable non ! J’aime aimer, je n’aime pas croire sans amour ; je veux fondre Dieu pour m’y fondre et le reste n’est pas envisageable. Du temps que j’écrivais !
-
-
-
-C'était cela le Christianisme, le grand-Christianisme des enfants et des imbéciles dont je me sais un homme averti ! Que revienne à leurs heures ses cancres de Marie-la-vierge ! Qu'on revienne sortir du confessionnal en ayant confesser si peu ; dit si peu, conjurer si peu - que nos consciences redeviennent un peu torves et malignes ! Finit tout ses hommes devenus des anges - les innocents ! Les faux-innocents, diable ! Ces menteurs, ces hypocrites ! Qu'on cesse donc enfin la pantomime de Dieu !
-
-
-
-Qu’ont ils fait de ce bon Christianisme-canaille toutes ses âmes sottes ; les connaisseurs - les fesses-marien ? Humanisme, réforme, contre-reforme, jansénisme, jesuitisme, thomisme, neo-thomisme. Catéchisme vu comme un mandarinat : en vérité le christianisme a été chassé des classes populaires par les chrétiens eux-mêmes qui se voulaient plus protestants que les protestants. On a vu des fêtes se faire interdire pour idolâtrie au fait que la vie religieuse ne retombât seul qu’aux actions de monseigneur le prêtre ; les actes des aprêtres ! - hors, ce ne sont jamais les intellectuels qui savent créer les formes et les représentations d’une foi vraiment naïve qu’ils ont méprisaient ; et désormais les voilà qu’ils se lamentent d’avoir perdu en ayant le culot d’haïr le peuple en supplément, qu’ils tiennent responsable de cette désaffection. Mais ne nous y trompons pas : on est toujours dans le même mouvement aujourd’hui Les foires, les fêtes du village disparaissent, les cours pratiques à l’école ont disparus parce que l’intellectualisme fait ses classes. Il faut saborder tout ses gens, tout revoir, refaire la révolution. Du temps qu’on intriguait.
-
-[IMAGE]marien.png[/IMAGE][LEGENDE]Portrait de Marien, converti-léger[/LEGENDE]`
-  },
-  // Pour ajouter un nouvel article, copiez la structure ci-dessous :
-  /*
-  {
-    title: "Titre de votre article",
-    deck: "Sous-titre ou accroche de votre article",
-    meta: "Par Auteur — Date",
-    content: `Votre texte ici...
-    
-    Utilisez [CITATION]texte[/CITATION] pour les citations.
-    
-    Utilisez [ENCADRE]
-    Titre de l'encadré
-    Texte de l'encadré
-    [/ENCADRE]
-    
-    Utilisez [IMAGE]url-de-image.jpg[/IMAGE][LEGENDE]Légende de l'image[/LEGENDE] pour ajouter une image`
-  },
-  */
+    image: "marien.png",
+    caption: "Portrait de Marien, converti-léger",
+    body: ""
+  }
 ];
 
 let currentArticleIndex = 0;
 
-const articleData = articlesDatabase[currentArticleIndex];
+// Compat avec l'ancien format { content: "...[IMAGE]...[/IMAGE]..." }
+function normalizeArticle(a) {
+  if (a.body === undefined && typeof a.content === 'string') {
+    const m = a.content.match(/[IMAGE](.*?)[/IMAGE](?:[LEGENDE](.*?)[/LEGENDE])?/);
+    if (m) { if (!a.image) a.image = m[1]; if (!a.caption) a.caption = m[2] || ''; }
+    a.body = a.content.replace(/[IMAGE].*?[/IMAGE](?:[LEGENDE].*?[/LEGENDE])?/g, '').trim();
+  }
+  if (a.body === undefined) a.body = '';
+  return a;
+}
+
+function applyData(data) {
+  if (!data || !Array.isArray(data.articles) || data.articles.length === 0) return false;
+  articlesDatabase = data.articles.map(normalizeArticle);
+  // Le plus récent en première page (les sans-date finissent en bas)
+  articlesDatabase.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  if (data.journal) journalConfig = Object.assign(journalConfig, data.journal);
+  if (currentArticleIndex >= articlesDatabase.length) currentArticleIndex = 0;
+  return true;
+}
+
+// Charge les données : data.json (site) puis, en mode brouillon, le cache local
+async function loadData() {
+  try {
+    const res = await fetch('data.json?_=' + Date.now(), { cache: 'no-store' });
+    if (res.ok) applyData(await res.json());
+  } catch (e) {}
+  const wantDraft = location.search.indexOf('draft') !== -1 || location.hash.indexOf('brouillon') !== -1;
+  if (wantDraft) {
+    try {
+      const local = localStorage.getItem('grappin-data');
+      if (local) applyData(JSON.parse(local));
+    } catch (e) {}
+  }
+}
+
+// Prévisualisation en direct depuis l'éditeur (editor.html)
+window.addEventListener('message', (ev) => {
+  const m = ev.data;
+  if (!m || m.type !== 'grappin-preview') return;
+  if (applyData(m.data)) {
+    let idx = -1;
+    if (m.id) idx = articlesDatabase.findIndex(a => a.id === m.id);
+    if (idx < 0 && typeof m.index === 'number') idx = m.index;
+    if (idx >= 0 && idx < articlesDatabase.length) currentArticleIndex = idx;
+    setRandomLocation();
+    setRandomEmail();
+    writeArticle();
+  }
+});
 
 // Fonction pour convertir le texte brut en HTML
 function formatContent(text) {
@@ -1149,14 +1210,10 @@ function formatContent(text) {
   }).filter(p => p).join('\n    ');
 }
 
-// Extraire l'image d'un article
-function extractImage(text) {
-  const imageMatch = text.match(/\[IMAGE\](.*?)\[\/IMAGE\](?:\[LEGENDE\](.*?)\[\/LEGENDE\])?/);
-  if (imageMatch) {
-    return {
-      url: imageMatch[1],
-      caption: imageMatch[2] || ''
-    };
+// Récupérer l'image d'un article (champs image/caption)
+function getArticleImage(article) {
+  if (article && article.image) {
+    return { url: article.image, caption: article.caption || '' };
   }
   return null;
 }
@@ -1185,7 +1242,15 @@ async function writeArticle() {
   const readTimeElement = document.getElementById('readTime');
   
   const currentArticle = articlesDatabase[currentArticleIndex];
-  const formattedContent = formatContent(currentArticle.content);
+  const formattedContent = formatContent(currentArticle.body);
+
+  // Habillage du journal (édition, prix, signature)
+  const editionEl = document.querySelector('.edition');
+  const priceEl = document.querySelector('.price');
+  const signatureEl = document.querySelector('.author-signature');
+  if (editionEl) editionEl.textContent = journalConfig.edition;
+  if (priceEl) priceEl.textContent = journalConfig.price;
+  if (signatureEl) signatureEl.textContent = currentArticle.signature || journalConfig.signature;
   
   // Afficher le contenu
   titleElement.innerHTML = currentArticle.title;
@@ -1194,7 +1259,7 @@ async function writeArticle() {
   contentElement.innerHTML = formattedContent;
   
   // Gérer l'image d'illustration
-  const image = extractImage(currentArticle.content);
+  const image = getArticleImage(currentArticle);
   if (image) {
     illustrationElement.innerHTML = `
       <figure class="article-illustration">
@@ -1207,7 +1272,7 @@ async function writeArticle() {
   }
   
   // Mettre à jour le temps de lecture (automatique)
-  readTimeElement.textContent = calculateReadTime(currentArticle.content);
+  readTimeElement.textContent = calculateReadTime(currentArticle.body);
   
   // Mettre à jour le compteur de vues (persistant avec localStorage)
   const viewKey = `article_views_${currentArticleIndex}`;
@@ -1265,7 +1330,68 @@ function nextArticle() {
   }
 }
 
-window.addEventListener('load', () => {
+// ===== Archives / Recherche =====
+const MOIS_ARCH = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+function formatArchiveDate(iso) {
+  if (!iso) return 'Sans date';
+  const p = iso.split('-');
+  if (p.length !== 3) return iso;
+  return (+p[2]) + ' ' + (MOIS_ARCH[+p[1]-1] || '') + ' ' + p[0];
+}
+function openArchive() {
+  document.getElementById('archiveOverlay').classList.add('active');
+  const s = document.getElementById('archiveSearch');
+  s.value = '';
+  renderArchive('');
+  s.focus();
+}
+function closeArchive() {
+  document.getElementById('archiveOverlay').classList.remove('active');
+}
+function renderArchive(q) {
+  q = (q || '').toLowerCase().trim();
+  const list = document.getElementById('archiveList');
+  // articlesDatabase est déjà trié du plus récent au plus ancien
+  const items = articlesDatabase
+    .map((a, i) => ({ a, i }))
+    .filter(({ a }) => {
+      if (!q) return true;
+      const hay = ((a.title||'') + ' ' + (a.deck||'') + ' ' + (a.body||'') + ' ' + (a.meta||'') + ' ' + formatArchiveDate(a.date)).toLowerCase();
+      return hay.indexOf(q) !== -1;
+    });
+  if (!items.length) { list.innerHTML = '<div class="archive-empty">Aucun article trouvé.</div>'; return; }
+  let html = '', curYear = null;
+  items.forEach(({ a, i }) => {
+    const year = (a.date || '').slice(0, 4) || '—';
+    if (year !== curYear) {
+      curYear = year;
+      html += '<div class="archive-year">' + (year === '—' ? 'Sans date' : year) + '</div>';
+    }
+    html += '<div class="archive-entry" onclick="openArticleByIndex(' + i + ')">'
+          + '<div class="ae-date">' + formatArchiveDate(a.date) + '</div>'
+          + '<div class="ae-title"></div><div class="ae-deck"></div></div>';
+  });
+  list.innerHTML = html;
+  // Remplissage texte (évite toute injection HTML depuis titres/chapeaux)
+  const entries = list.querySelectorAll('.archive-entry');
+  items.forEach(({ a }, k) => {
+    entries[k].querySelector('.ae-title').textContent = a.title || '(sans titre)';
+    entries[k].querySelector('.ae-deck').textContent = a.deck || '';
+  });
+}
+function openArticleByIndex(i) {
+  if (i < 0 || i >= articlesDatabase.length) return;
+  currentArticleIndex = i;
+  closeArchive();
+  writeArticle();
+  setRandomLocation();
+  setRandomEmail();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeArchive(); });
+
+window.addEventListener('load', async () => {
+  await loadData();
   setRandomLocation();
   setRandomEmail();
   writeArticle();
